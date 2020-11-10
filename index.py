@@ -54,6 +54,11 @@ while True:
             passwordInput.send_keys(password)
             passwordInput.send_keys(Keys.RETURN)
             time.sleep(2)
+        else:
+            # opens the desired page in the browser and waits for some time before continuing
+            driver.get(page)
+            time.sleep(2)
+
 
         # finds the field for the chat box and clicks it to enable typing
         textInput = driver.find_elements_by_xpath('/html/body/div[2]/div/div[2]/div[3]/div/div[2]/div[2]/div/div/div[1]/div[1]/div[1]/div[1]')[0]

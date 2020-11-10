@@ -21,7 +21,7 @@ password = os.getenv("password")
 thingsToType = [
     "This is a message", 
     "Pretending to type", 
-    "Hi there, I a busy typing on slack", 
+    "Hi there, I am busy typing on slack", 
 ]
 
 # set the driver to false

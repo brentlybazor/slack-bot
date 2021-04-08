@@ -18,11 +18,8 @@ email = os.getenv("email")
 domainName = os.getenv("domainName")
 password = os.getenv("password")
 
-thingsToType = [
-    "This is a message", 
-    "Pretending to type", 
-    "Hi there, I am busy typing on slack", 
-]
+with open('messages.txt') as my_file:
+    thingsToType = my_file.readlines()
 
 # set the driver to false
 driver = False
@@ -59,13 +56,19 @@ while True:
             driver.get(page)
             time.sleep(2)
 
+        popupButton = driver.find_elements_by_xpath('/html/body/div[6]/div/div/div/div/div/button')
+        if popupButton:
+            popupButton[0].click()
+            print('button found')
+        if not popupButton:
+            print('button not found')
 
         # finds the field for the chat box and clicks it to enable typing
         textInput = driver.find_elements_by_xpath('/html/body/div[2]/div/div[2]/div[3]/div/div[2]/div[2]/div/div/div[1]/div[1]/div[1]/div[1]')[0]
         textInput.click()
         
         # gets random text to type from the array above 
-        textToType = thingsToType[random.randrange(len(thingsToType))]
+        textToType = thingsToType[random.randrange(len(thingsToType))].rstrip('\n')
 
         # loops through each letter in the string and simulates typing
         typeIndex = 0

@@ -59,9 +59,7 @@ while True:
         popupButton = driver.find_elements_by_xpath('/html/body/div[6]/div/div/div/div/div/button')
         if popupButton:
             popupButton[0].click()
-            print('button found')
-        if not popupButton:
-            print('button not found')
+            time.sleep(2)
 
         # finds the field for the chat box and clicks it to enable typing
         textInput = driver.find_elements_by_xpath('/html/body/div[2]/div/div[2]/div[3]/div/div[2]/div[2]/div/div/div[1]/div[1]/div[1]/div[1]')[0]

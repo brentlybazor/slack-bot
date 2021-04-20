@@ -62,25 +62,26 @@ while True:
             time.sleep(2)
 
         # finds the field for the chat box and clicks it to enable typing
-        textInput = driver.find_elements_by_xpath('/html/body/div[2]/div/div[2]/div[3]/div/div[2]/div[2]/div/div/div[1]/div[1]/div[1]/div[1]')[0]
+        textInputXPath = '/html/body/div[2]/div/div[2]/div[3]/div/div[2]/div[2]/div/div/div[1]/div/div/div[1]/div/div[1]'
+        textInput = driver.find_elements_by_xpath(textInputXPath)[0]
         textInput.click()
         
         # gets random text to type from the array above 
         textToType = thingsToType[random.randrange(len(thingsToType))].rstrip('\n')
-
+        
         # loops through each letter in the string and simulates typing
         typeIndex = 0
         while typeIndex < len(textToType):
             textInput.send_keys(textToType[typeIndex])
             time.sleep(.25)
             typeIndex += 1
-
         time.sleep(2)
 
         # loops through each letter in the string and simulates deleting text
-        while len(textInput.text) > 0:
-            textInput.send_keys(Keys.BACK_SPACE)
-            time.sleep(.25)
+        if len(textInput.text) > 0:
+            while len(textInput.text) > 0:
+                textInput.send_keys(Keys.BACK_SPACE)
+                time.sleep(.25)
 
         # creates a randome number of mins (up to 15 mins) to wait before running the program again
         secondsToSleep = random.randrange(15) * 60

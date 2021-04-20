@@ -7,9 +7,9 @@ from functions import *
 from pathlib import Path
 import random
 
-dotenv.load_dotenv()
 env_path = Path('.') / '.env.local'
 dotenv.load_dotenv(dotenv_path=env_path)
+dotenv.load_dotenv()
 
 PATH = os.getenv("webdriverPath")
 

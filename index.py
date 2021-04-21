@@ -116,7 +116,7 @@ driver = False
 # continues indefinately until the program is manually stopped
 while True:
     # checks to see if they program should run based on the working hours
-    if not workingHours():
+    if workingHours():
         # check to see if the driver or browers is already set (it initializes after the first load)
         # this check prevents multiple browser windows from opening when the program loops
         if not driver:

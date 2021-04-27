@@ -26,6 +26,12 @@ password = os.getenv("password")
 with open('messages.txt') as my_file:
     thingsToType = my_file.readlines()
 
+def forceRun():
+    if '-force' in sys.argv:
+        return True
+    
+    return False
+
 def determineHeadless():
     if '-hl' in sys.argv:
         chrome_options.add_argument("--headless") 
@@ -128,7 +134,7 @@ driver = False
 # continues indefinately until the program is manually stopped
 while True:
     # checks to see if they program should run based on the working hours
-    if workingHours():
+    if forceRun() or workingHours():
         # check to see if the driver or browers is already set (it initializes after the first load)
         # this check prevents multiple browser windows from opening when the program loops
         if not driver:

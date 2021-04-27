@@ -1,7 +1,9 @@
 import dotenv
+import sys
 import os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 import time
 from functions import *
 from pathlib import Path
@@ -13,6 +15,9 @@ dotenv.load_dotenv()
 
 PATH = os.getenv("webdriverPath")
 
+chrome_options = Options()  
+chrome_options.add_argument("--log-level=3") 
+
 page = os.getenv("page")
 email = os.getenv("email")
 domainName = os.getenv("domainName")
@@ -21,7 +26,14 @@ password = os.getenv("password")
 with open('messages.txt') as my_file:
     thingsToType = my_file.readlines()
 
-def navigateToPage(page):
+def determineHeadless():
+    if '-hl' in sys.argv:
+        chrome_options.add_argument("--headless") 
+        chrome_options.add_argument("--disable-gpu") 
+        chrome_options.add_argument("--window-size=1920,1200")
+        chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+def navigateToPage(page):    
     # opens the desired page in the browser and waits for some time before continuing
     driver.get(page)
     time.sleep(2)
@@ -120,7 +132,8 @@ while True:
         # check to see if the driver or browers is already set (it initializes after the first load)
         # this check prevents multiple browser windows from opening when the program loops
         if not driver:
-            driver = webdriver.Chrome(PATH)
+            determineHeadless()
+            driver = webdriver.Chrome(PATH, options=chrome_options)
             navigateToPage(page)
             enterDomain()
             fillOutLogin()

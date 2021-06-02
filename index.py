@@ -8,6 +8,7 @@ import time
 from functions import *
 from pathlib import Path
 import random
+import datetime
 
 env_path = Path('.') / '.env.local'
 dotenv.load_dotenv(dotenv_path=env_path)
@@ -23,11 +24,71 @@ email = os.getenv("email")
 domainName = os.getenv("domainName")
 password = os.getenv("password")
 
+currentMessage=''
+timesActivatedTotal=0
+timesActivatedSinceDownTime=0
+startTime=datetime.datetime.now().strftime("%x %X")
+startTimeRecent=datetime.datetime.now().strftime("%x %X")
+mostRecentActivation=''
+
+currentlyDownTime=True
+
+
+def messageOutput(currentMessage):
+    if '--logs' in sys.argv:    
+        print(
+            'total times run: ', timesActivatedTotal, '\t',
+            'total times run today: ', timesActivatedSinceDownTime, '\t',
+            'start time: ', startTime, '\t',
+            'start time since downtime: ', startTimeRecent, '\t', 
+            'most recent run: ', mostRecentActivation, '\t', 
+            currentMessage, '\t\t\t', 
+            end="\r"
+        )
+        return 
+    if '--short-logs' in sys.argv:    
+        print(
+                'total: ', timesActivatedTotal, ' ',
+                'total r: ', timesActivatedSinceDownTime, ' ',
+                'st: ', startTime, ' ',
+                'st r: ', startTimeRecent, ' ', 
+                'r: ', mostRecentActivation, ' ', 
+                currentMessage, '\t\t\t', 
+                end="\r"
+            )
+        return
+
+    print(currentMessage, '\t', end='\r') 
+
+def finishedRunningUpdateValues():
+    global timesActivatedTotal
+    timesActivatedTotal += 1
+
+    global timesActivatedSinceDownTime
+    timesActivatedSinceDownTime += 1
+
+    global mostRecentActivation
+    mostRecentActivation = getCurrentTime()
+    
+
+def determineStartRunUpdateValues():
+    if currentlyDownTime:
+        global timesActivatedSinceDownTime
+        timesActivatedSinceDownTime = 0
+
+        global startTimeRecent
+        startTimeRecent = getCurrentTime()
+
+def getCurrentTime():
+    return datetime.datetime.now().strftime("%x %X")
+
+
 with open('messages.txt') as my_file:
     thingsToType = my_file.readlines()
 
 def forceRun():
     if '-force' in sys.argv:
+        messageOutput('forced run (will run outside or working hours)')
         return True
     
     return False
@@ -88,13 +149,13 @@ def simulateDeleteMessage(textInput):
             time.sleep(.25)
 
 def simulateBeingBusy():
-    # creates a randome number of mins (up to 15 mins) to wait before running the program again
+    # creates a random number of mins (up to 15 mins) to wait before running the program again
     secondsToSleep = random.randrange(15) * 60
     # this loop run for every second in secondsToSleep and displays a countdown timer in the console
     # if time has not expired display the timer
     while int(secondsToSleep) > 0:
         if int(secondsToSleep) != 0:
-            print(convertSeconds(secondsToSleep) + ' until next try\t\t\t\t', end="\r")
+            messageOutput(convertSeconds(secondsToSleep) + ' until next try')
             time.sleep(1)
             # set the time to decrement by 1  
             secondsToSleep -= 1
@@ -102,7 +163,7 @@ def simulateBeingBusy():
         # the secondsToSleep decrement above so this can check if they countdown is expired
         # if expired, the text changed to currently running and then restarts the program
         if int(secondsToSleep) == 0:
-            print('currently running\t\t\t\t', end='\r')
+            messageOutput('currently running')
 
 
 
@@ -118,13 +179,15 @@ def typeMessageSequence():
 
     simulateDeleteMessage(textInput)
 
+    finishedRunningUpdateValues()
+
     simulateBeingBusy()
 
 def downTimeSequence():
     # creates a countdown time for 25 mins and then runs the program again
     secondsToSleep = 25 * 60
     while int(secondsToSleep) > 0:
-        print("not currently working hours. trying again in " + convertSeconds(secondsToSleep), end='\r')
+        messageOutput("not currently working hours. trying again in " + convertSeconds(secondsToSleep))
         time.sleep(1)
         secondsToSleep -= 1
 
@@ -135,6 +198,9 @@ driver = False
 while True:
     # checks to see if they program should run based on the working hours
     if forceRun() or workingHours():
+        determineStartRunUpdateValues()
+        currentlyDownTime=False
+
         # check to see if the driver or browers is already set (it initializes after the first load)
         # this check prevents multiple browser windows from opening when the program loops
         if not driver:
@@ -153,4 +219,5 @@ while True:
         typeMessageSequence()
 
     else:
+        currentlyDownTime=True
         downTimeSequence()
